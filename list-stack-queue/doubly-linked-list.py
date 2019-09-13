@@ -1,9 +1,9 @@
 class Node(object):
 
-    def __init__(self, data, nxt=None):
+    def __init__(self, data, nxt=None, before=None):
         self.data = data
         self.nxt = nxt
-
+        self.before = before
 
 class LinkedList(object):
 
@@ -31,7 +31,9 @@ class LinkedList(object):
                 if lastNode.nxt is None:
                     break
                 lastNode = lastNode.nxt
+            newNode.before = lastNode
             lastNode.nxt = newNode
+
         self.size += 1
 
     def insertBegin(self, newNode):
@@ -42,11 +44,15 @@ class LinkedList(object):
             temp = self.root
             self.root = newNode
             self.root.nxt = temp
+            self.root.nxt.before = self.root
+
         self.size += 1
 
     def insertSorted(self, newNode):
         if newNode.nxt is None:
             self.insertEnd(newNode)
+            self.size += 1
+            return
 
         else:
             lastNode = self.root
@@ -57,9 +63,9 @@ class LinkedList(object):
                 lastNode = temp
                 temp = lastNode.nxt
             lastNode.nxt = newNode
+            newNode.before = lastNode
             newNode.nxt = temp
-
-        self.size += 1
+            newNode.nxt.before = newNode
 
     def removeBegin(self):
         if self.emptyList():
@@ -68,11 +74,12 @@ class LinkedList(object):
 
         else:
             self.root = self.root.nxt
-            self.size -= 1
+            self.root.before = None
 
     def removeEnd(self):
         if self.emptyList():
             print('The list is empty')
+            return
 
         else:
             lastNode = self.root
@@ -81,12 +88,11 @@ class LinkedList(object):
                 prev = lastNode
                 lastNode = lastNode.nxt
             prev.nxt = None
-            self.size -= 1
 
     def removeNode(self, nodeData):
         if self.emptyList():
             print('The list is empty')
-            return False
+            return
 
         else:
             currentNode = self.root
@@ -95,11 +101,12 @@ class LinkedList(object):
                 if currentNode.data == nodeData:
                     if prev is not None:
                         prev.nxt = currentNode.nxt
+                        currentNode.nxt.before = prev
 
                     else:
                         self.root = currentNode.nxt
+                        self.root.before = None
 
-                    self.size -= 1
                     return True
 
                 prev = currentNode
@@ -160,7 +167,8 @@ def main():
     myList.removeEnd()
     myList.printList()
     print('')
-    print(myList.root.data)
-
+    print(myList.root.nxt)
+    print(myList.root.nxt.before)
+    print(myList.get_size())
 
 main()

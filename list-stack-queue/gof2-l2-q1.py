@@ -1,5 +1,7 @@
 import numpy as np
 
+# Q1
+
 class No:
     def __init__(self, data=None, prox=None, ante=None):
         self.data = data
@@ -29,6 +31,8 @@ class ListaDuplamenteEncadeada:
             self.root.prox = None
 
         else:
+            if type(novoNo) is str or type(novoNo) is int or type(novoNo) is dict or type(novoNo) is list or type(novoNo) is tuple:
+                novoNo = No(novoNo)
             ultimoNo = self.root
             while ultimoNo.prox is not None:
                 ultimoNo = ultimoNo.prox
@@ -38,31 +42,34 @@ class ListaDuplamenteEncadeada:
         self.size += 1
 
     def __str__(self):
-        nos = ''
+        if self.size > 0:
+            nos = ''
 
-        ultimoNo = self.root
-        while True:
-            if ultimoNo.prox is None:
-                nos += ultimoNo.data
-                break
-            else:
-                nos += ultimoNo.data + ', '
-            ultimoNo = ultimoNo.prox
+            ultimoNo = self.root
+            while True:
+                if ultimoNo.prox is None:
+                    nos += str(ultimoNo.data)
+                    break
+                else:
+                    nos += str(ultimoNo.data) + ', '
+                ultimoNo = ultimoNo.prox
 
-        return nos
+            return nos
 
+        else:
+            return 'Lista vazia'
     def __repr__(self):
-        retorno = 'ListaEncadeadaDupla('
-        if type(self.objeto_iteravel) is str:
-            retorno += "\'"+ self.objeto_iteravel + '\'' + ')'
+        if self.listaVazia():
+            return 'ListaEncadeadaDupla()'
 
-        elif type(self.objeto_iteravel) is list:
-            retorno += "["+ self.objeto_iteravel + ']' + ')'
-
-        elif type(self.objeto_iteravel) is dict:
-            retorno += "{" + self.objeto_iteravel + '}' + ')'
-
-        return retorno
+        retorno = 'ListaEncadeadaDupla(['
+        ultimo = self.root
+        while True:
+            if ultimo.prox is None:
+                retorno += str(ultimo.data) + '])'
+                return retorno
+            retorno += str(ultimo.data) + ', '
+            ultimo = ultimo.prox
 
     def __getitem__(self, indice):
         try:
@@ -110,18 +117,174 @@ class ListaDuplamenteEncadeada:
         except ValueError:
             print('ERRO !\nVocê inseriu um valor que não existe')
 
-    #def anexar
+    def selecionar(self, indice):
+        if indice >= self.size:
+            print('Índice maior que a quantidade de índices da lista')
+        else:
+            if indice == 0:
+                item = self.root.data
+                self.root = self.root.prox
+                #self.root.ante = None
+            else:
+                inicio = 0
+                achado = self.root
+                proximo = achado.prox
+                while inicio < indice:
+                    achado = proximo
+                    proximo = achado.prox
+                    inicio += 1
+                item = achado.data
+                achado.ante.prox = proximo
+                proximo.ante = achado.ante
+            self.size -= 1
+            return item
 
-def main():
-    lista = ListaDuplamenteEncadeada('algoritmos')
-    print(lista)
-    print(repr(lista))
-    print(lista[10])
-    lista[0] = 'abc'
-    print(lista[0])
-    print(lista.indice('s'))
-    joao = No('joao')
-    lista.anexar(joao)
-    print(lista[10])
+    def inserir(self, indice, valor):
+        if indice > self.size:
+            print('índice não pode ser inserido na lista')
+            return
 
-main()
+        if self.listaVazia():
+            valor = No(valor)
+            self.root = valor
+            self.root.prox = None
+
+        else:
+            inicio = 0
+            if type(valor) is str or type(valor) is int or type(valor) is dict or type(valor) is list or type(valor) is tuple:
+                valor = No(valor)
+
+            if indice == 0:
+                temp = self.root
+                self.root = valor
+                self.root.prox = temp
+                temp.ante = self.root
+            else:
+                achado = self.root
+                proximo = achado.prox
+                while inicio < indice:
+                    achado = proximo
+                    proximo = achado.prox
+                    inicio += 1
+                temp = achado.ante
+                valor.ante = temp
+                achado.ante.prox = valor
+                achado.ante = valor
+                valor.prox = achado
+        self.size += 1
+
+    def concatenar(self, lista):
+        ultimoLista = lista.root
+        while ultimoLista.prox is not None:
+            self.anexar(lista.selecionar(0))
+            ultimoLista = ultimoLista.prox
+        self.anexar(lista.selecionar(0))
+
+class Ponteiro:
+    def __init__(self, lista):
+        self.passo = lista.root
+
+    def __next__(self):
+        agora = self.passo.data
+        self.passo = self.passo.prox
+
+        return agora
+
+    def ultimoDaLista(self):
+        try:
+            while True:
+                self.passo = self.passo.prox
+                if self.passo.prox is None:
+                    raise StopIteration
+        except StopIteration:
+            print('A iteração chegou ao fim')
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# Q2
+
+class Fila:
+    def __init__(self, size, inicio=-1):
+        self.inicio = inicio
+        self.end = inicio
+        self.size = size
+        self.espacosVazios = size
+        self.queue = np.empty(size, int)
+
+    def filaVazia(self):
+        if self.espacosVazios == self.size:
+            return True
+        else:
+            return False
+
+    def filaCheia(self):
+        if self.espacosVazios == 0:
+            return True
+        else:
+            return False
+
+    def enqueue(self, num):
+        if self.filaCheia():
+            print('A fila está cheia')
+            return
+
+        elif self.filaVazia():
+            self.inicio += 1
+            self.queue[self.inicio] = num
+            self.espacosVazios -= 1
+            self.end += 1
+
+        else:
+            self.espacosVazios -= 1
+            if self.end == self.size - 1:
+                self.end = 0
+            else:
+                self.end += 1
+            self.queue[self.end] = num
+
+    def dequeue(self):
+        if self.filaVazia():
+            print('A fila está vazia')
+            return
+        else:
+            self.espacosVazios += 1
+            removido = self.queue[self.inicio]
+            if self.inicio == self.size - 1:
+                self.inicio = 0
+            else:
+                self.inicio += 1
+            return removido
+
+class Pilha(Fila):
+    def __init__(self, size):
+        self.pilha = np.empty(size, int)
+        self.topo = -1
+        self.size = size
+
+    def filaVazia(self):
+        if self.topo == -1:
+            return True
+        else:
+            return False
+
+    def dequeue(self):
+        if self.topo == -1:
+            print('Não há elementos na pilha')
+            return
+        else:
+            self.topo -= 1
+            return self.pilha[self.topo + 1]
+
+    def filaCheia(self):
+        if (self.topo + 1) == self.size:
+            return True
+        else:
+            return False
+
+    def enqueue(self, num):
+        if self.filaCheia():
+            print('A pilha está cheia')
+            return False
+        else:
+            self.pilha[self.topo + 1] = num
+            self.topo += 1

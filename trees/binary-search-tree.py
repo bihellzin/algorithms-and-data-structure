@@ -23,12 +23,42 @@ class BinaryTree:
                         break
                     node = node.left
 
-                else:
+                elif newNode.value > node.value:
                     if node.right is None:
                         node.right = newNode
                         newNode.parent = node
                         break
                     node = node.right
+
+                elif newNode.value == node.value:
+                    print('Value already put in the tree')
+                    break
+
+    def search(self, value):
+        node = self.root
+        if value == node.value:
+            return node.value
+
+        while True:
+            if value > node.value:
+                if node.value == value:
+                    return value
+
+                elif node.right is None:
+                    print('Value not found')
+                    return
+
+                node = node.right
+
+            else:
+                if node.value == value:
+                    return value
+
+                elif node.left is None:
+                    print('Value not found')
+                    return
+
+                node = node.left
 
 if __name__ == '__main__':
     arvre = BinaryTree()
@@ -37,10 +67,14 @@ if __name__ == '__main__':
     no1 = Node(1)
     no3 = Node(3)
     no6 = Node(6)
+    no8 = Node(8)
+    no = Node(3)
 
     arvre.insert(no2)
     arvre.insert(no4)
     arvre.insert(no1)
     arvre.insert(no3)
     arvre.insert(no6)
-    print(arvre.root.right.right.value)
+    arvre.insert(no8)
+    arvre.insert(no)
+    print(arvre.root.right.left.right)

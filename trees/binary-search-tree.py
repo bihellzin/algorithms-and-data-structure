@@ -63,6 +63,7 @@ class BinaryTree:
     def remove(self, value):
         node = self.search(value)
         if node is not False:
+            # No child case
             if node.right is None and node.left is None:
                 if node.parent.right == node:
                     node.parent.right = None
@@ -71,9 +72,37 @@ class BinaryTree:
                     node.parent.left = None
                     node.parent = None
 
+            # 2 children case
             elif node.right is not None and node.left is not None:
-                pass
+                curNode = node.right
+                while curNode.left is not None:
+                    curNode = curNode.left
 
+                curNode.left = node.left
+                node.left.parent = curNode
+
+                if node.right is curNode:
+                    temp2 = curNode.left
+                    curNode.right = node.right.right
+                    curNode.left = temp2
+                    temp2.parent = curNode
+
+                else:
+                    curNode.right = node.right
+                    temp2 = node.right
+                    while temp2.left is not None:
+                        temp2 = temp2.left
+                    temp2.parent.left = None
+
+                curNode.parent = node.parent
+
+                if node.value > node.parent.value:
+                    node.parent.right = curNode
+
+                elif node.value < node.parent.value:
+                    node.parent.left = curNode
+
+            # 1 child case
             elif node.right is None and node.left is not None:
                 if node.value > node.parent.value:
                     node.parent.right = node.left
@@ -94,22 +123,40 @@ class BinaryTree:
 
         else:
             return False
-        
+
 if __name__ == '__main__':
     arvre = BinaryTree()
-    no2 = Node(2)
-    no4 = Node(4)
-    no1 = Node(1)
+    no12 = Node(12)
+    no5 = Node(5)
     no3 = Node(3)
-    #no6 = Node(6)
-    #no8 = Node(8)
+    no1 = Node(1)
+    no7 = Node(7)
+    no8 = Node(8)
+    no9 = Node(9)
+    no11 = Node(11)
+    no15 = Node(15)
+    no17 = Node(17)
+    no20 = Node(20)
+    no18 = Node(18)
+    no13 = Node(13)
+    no14 = Node(14)
+    no16 = Node(16)
 
 
-    arvre.insert(no2)
-    arvre.insert(no4)
-    arvre.insert(no1)
+    arvre.insert(no12)
+    arvre.insert(no5)
     arvre.insert(no3)
-    #arvre.insert(no6)
-    #arvre.insert(no8)
-    arvre.remove(4)
-    print(arvre.root.right.value)
+    arvre.insert(no1)
+    arvre.insert(no7)
+    arvre.insert(no9)
+    arvre.insert(no8)
+    arvre.insert(no11)
+    arvre.insert(no15)
+    arvre.insert(no17)
+    arvre.insert(no13)
+    arvre.insert(no14)
+    arvre.insert(no20)
+    arvre.insert(no18)
+    arvre.insert(no16)
+    arvre.remove(15)
+    print(arvre.root.right.right.right.left.value)

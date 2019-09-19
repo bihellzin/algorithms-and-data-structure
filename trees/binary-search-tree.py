@@ -124,6 +124,28 @@ class BinaryTree:
         else:
             return False
 
+    def printPreOrder(self, root):
+
+        if root:
+            print(root.value)
+
+            self.printPreOrder(root.left)
+            self.printPreOrder(root.right)
+
+    def printInOrder(self, root):
+
+        if root:
+            self.printInOrder(root.left)
+            print(root.value)
+            self.printInOrder(root.right)
+
+    def printPostOrder(self, node=None):
+
+        if root:
+            self.printPostOrder(root.left)
+            self.printPostOrder(root.right)
+            print(root.value)
+
 if __name__ == '__main__':
     arvre = BinaryTree()
     no12 = Node(12)
@@ -158,5 +180,5 @@ if __name__ == '__main__':
     arvre.insert(no20)
     arvre.insert(no18)
     arvre.insert(no16)
-    arvre.remove(15)
-    print(arvre.root.right.right.right.left.value)
+
+    print(arvre.printPostOrder(arvre.root))

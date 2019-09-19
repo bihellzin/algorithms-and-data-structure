@@ -124,22 +124,21 @@ class BinaryTree:
         else:
             return False
 
-    def printPreOrder(self, root):
+    def printPreOrder(self, root=None):
 
         if root:
             print(root.value)
-
             self.printPreOrder(root.left)
             self.printPreOrder(root.right)
 
-    def printInOrder(self, root):
+    def printInOrder(self, root=None):
 
         if root:
             self.printInOrder(root.left)
             print(root.value)
             self.printInOrder(root.right)
 
-    def printPostOrder(self, node=None):
+    def printPostOrder(self, root=None):
 
         if root:
             self.printPostOrder(root.left)

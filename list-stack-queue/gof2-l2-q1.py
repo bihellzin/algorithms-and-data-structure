@@ -180,24 +180,21 @@ class ListaDuplamenteEncadeada:
             ultimoLista = ultimoLista.prox
         self.anexar(lista.selecionar(0))
 
-class Ponteiro:
-    def __init__(self, lista):
-        self.passo = lista.root
+    def __iter__(self):
+        class Ponteiro:
+            def __init__(self, lista, passo=0):
+                self.passo = passo
+                self.lista = lista
 
-    def __next__(self):
-        agora = self.passo.data
-        self.passo = self.passo.prox
-
-        return agora
-
-    def ultimoDaLista(self):
-        try:
-            while True:
-                self.passo = self.passo.prox
-                if self.passo.prox is None:
+            def __next__(self):
+                if self.passo >= self.lista.size:
                     raise StopIteration
-        except StopIteration:
-            print('A iteração chegou ao fim')
+                value = self.lista[self.passo]
+                self.passo += 1
+
+                return value
+
+        return Ponteiro(self)
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -288,3 +285,8 @@ class Pilha(Fila):
         else:
             self.pilha[self.topo + 1] = num
             self.topo += 1
+
+if __name__ == '__main__':
+    lista = ListaDuplamenteEncadeada('algoritmos')
+    for p in lista:
+        print(p)

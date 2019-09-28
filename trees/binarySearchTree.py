@@ -8,8 +8,11 @@ class Node:
 class BinaryTree:
     def __init__(self, root=None):
         self.root = root
+        self.elementos = 0
 
     def insert(self, newNode):
+        if type(newNode) is int:
+            newNode = Node(newNode)
         if self.root is None:
             self.root = newNode
 
@@ -33,6 +36,7 @@ class BinaryTree:
                 elif newNode.value == node.value:
                     print('Value already put in the tree')
                     break
+        self.elementos += 1
 
     def search(self, value):
         node = self.root
@@ -124,12 +128,14 @@ class BinaryTree:
         else:
             return False
 
-    def printPreOrder(self, root=None):
+    def printPreOrder(self, root=None, lista=[]):
 
         if root:
-            print(root.value)
-            self.printPreOrder(root.left)
-            self.printPreOrder(root.right)
+            lista.append(root.value)
+            self.printPreOrder(root.left, lista)
+            self.printPreOrder(root.right, lista)
+
+        return lista
 
     def printInOrder(self, root=None):
 
@@ -144,6 +150,51 @@ class BinaryTree:
             self.printPostOrder(root.left)
             self.printPostOrder(root.right)
             print(root.value)
+
+    def vazia(self):
+        if self.root is None:
+            return True
+        return False
+
+    def __str__(self):
+        if self.vazia():
+            return None
+        return str(self.printInOrder(self.root))
+
+    def __bool__(self):
+        if self.vazia:
+            return False
+        return True
+
+    def __repr__(self):
+        if self.vazia():
+            return str('BinaryTree()')
+        else:
+            saida = 'BinaryTree('
+            retorno = self.printPreOrder(self.root)
+            saida += str(retorno)[1:-1]
+            saida += ')'
+            return str(saida)
+
+    def __iter__(self):
+        class Ponteiro:
+            def __init__(self, arvore, passo=0):
+                self.arvore = arvore
+                self.passo = passo
+
+            def __next__(self):
+                lista = self.arvore.printPreOrder(self.arvore.root)
+                if self.passo >= self.arvore.elementos:
+                    raise StopIteration
+                value = lista[self.passo]
+                self.passo += 1
+
+                return value
+        return Ponteiro(self)
+
+    def reiniar(self):
+        
+
 
 if __name__ == '__main__':
     arvre = BinaryTree()
@@ -180,4 +231,4 @@ if __name__ == '__main__':
     arvre.insert(no18)
     arvre.insert(no16)
 
-    print(arvre.printPostOrder(arvre.root))
+    print(arvre)

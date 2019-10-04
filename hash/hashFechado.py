@@ -1,4 +1,16 @@
 import numpy as np
+'''
+Depende da abordagem que se espera, caso a intenção seja provar os casos onde
+a certeza é de 100%, deve ser utilizado o endereçamento fechado, com cada índice
+da tabela representando um dia do ano. Caso o interesse seja comprovar os outros
+casos, onde o número de pessoas é fixo, então a tabela de endereçamento aberto
+é uma opção.
+
+O tipo de tabela utilizado deve ser o de endereçamento fechado, pois devo ter
+certeza de que eu não vou ocupar 2 espaços na lista com duas pessoas fazendo 
+aniversário no mesmo dia. Caso isso ocorra, já se torna impossível provar o
+paradóxo para se ter 100% de certeza.
+'''
 
 
 class Node:
@@ -176,9 +188,79 @@ class LinkedList:
 
 
 class HashTable:
-    def __init__(self, indices=0):
+    def __init__(self, indices=365):
         self.tabela = np.full(indices, None)
         self.indices = indices
 
-    def lerArquivo(self, arquivo):
-        pass
+    def lerArquivo(self, arquivo='pessoasEDatas.txt'):
+        file = open(arquivo, 'r')
+        linhas = []
+
+        for linha in file.readlines():
+            linha = linha.strip()
+            linha = linha.split()
+            linhas.append(linha)
+
+        return linhas
+
+    def adicionarNaTabela(self):
+        arquivo = self.lerArquivo()
+
+        for i in range(len(arquivo)):
+            if arquivo[i][1][3:5] == '01':
+                indiceNaTabela = int(arquivo[i][1][0:2]) % self.indices
+
+            elif arquivo[i][1][3:5] == '02':
+                indiceNaTabela = (int(arquivo[i][1][0:2]) + 31) % self.indices
+
+            elif arquivo[i][1][3:5] == '03':
+                indiceNaTabela = (int(arquivo[i][1][0:2]) + 59) % self.indices
+
+            elif arquivo[i][1][3:5] == '04':
+                indiceNaTabela = (int(arquivo[i][1][0:2]) + 90) % self.indices
+
+            elif arquivo[i][1][3:5] == '05':
+                indiceNaTabela = (int(arquivo[i][1][0:2]) + 120) % self.indices
+
+            elif arquivo[i][1][3:5] == '06':
+                indiceNaTabela = (int(arquivo[i][1][0:2]) + 151) % self.indices
+
+            elif arquivo[i][1][3:5] == '07':
+                indiceNaTabela = (int(arquivo[i][1][0:2]) + 181) % self.indices
+
+            elif arquivo[i][1][3:5] == '08':
+                indiceNaTabela = (int(arquivo[i][1][0:2]) + 212) % self.indices
+
+            elif arquivo[i][1][3:5] == '09':
+                indiceNaTabela = (int(arquivo[i][1][0:2]) + 243) % self.indices
+
+            elif arquivo[i][1][3:5] == '10':
+                indiceNaTabela = (int(arquivo[i][1][0:2]) + 273) % self.indices
+
+            elif arquivo[i][1][3:5] == '11':
+                indiceNaTabela = (int(arquivo[i][1][0:2]) + 304) % self.indices
+
+            elif arquivo[i][1][3:5] == '12':
+                indiceNaTabela = (int(arquivo[i][1][0:2]) + 334) % self.indices
+
+            else:
+                continue
+
+            if self.tabela[indiceNaTabela] is None:
+                self.tabela[indiceNaTabela] = LinkedList()
+                self.tabela[indiceNaTabela].inserirInicio(
+                    arquivo[i][0] + ' ' + arquivo[i][1])
+
+            else:
+                self.tabela[indiceNaTabela].inserirFinal(
+                    arquivo[i][0] + ' ' + arquivo[i][1])
+
+    def imprimirDoisOuMais(self):
+        for i in range(len(self.tabela)):
+            if self.tabela[i] is None:
+                continue
+
+            else:
+                if self.tabela[i].size >= 2:
+                    for j in self.tabela[i]:
+                        print(j)

@@ -1,47 +1,79 @@
 class Node:
-    def __init__(self, value, right=None, left=None):
+    def __init__(self, value, key, right=None, left=None):
         self.value = value
+        self.key = key
         self.right = right
         self.left = left
         self.parent = None
+
+    def __eq__(self, outroNo):
+        if type(self) != type(outroNo):
+            raise TypeError
+        return self.value == outroNo.value
+
+    def __lt__(self, outroNo):
+        if type(self) != type(outroNo):
+            raise TypeError
+        return self.value < outroNo.value
+
+    def __le__(self, outroNo):
+        if type(self) != type(outroNo):
+            raise TypeError
+        return self.value <= outroNo.value
+
+    def __gt__(self, outroNo):
+        if type(self) != type(outroNo):
+            raise TypeError
+        return self.value > outroNo.value
+
+    def __ge__(self, outroNo):
+        if type(self) != type(outroNo):
+            raise TypeError
+        return self.value >= outroNo.value
+
+    def __ne__(self, outroNo):
+        if type(self) != type(outroNo):
+            raise TypeError
+        return self.value != outroNo.value
+
 
 class BinaryTree:
     def __init__(self, root=None):
         self.root = root
         self.elementos = 0
 
-    def insert(self, newNode):
+    def insert(self, newNode, key):
         if type(newNode) is int:
-            newNode = Node(newNode)
+            newNode = Node(newNode, key)
         if self.root is None:
             self.root = newNode
 
         else:
             node = self.root
             while newNode.parent is None:
-                if newNode.value < node.value:
+                if newNode < node:
                     if node.left is None:
                         node.left = newNode
                         newNode.parent = node
                         break
                     node = node.left
 
-                elif newNode.value > node.value:
+                elif newNode > node:
                     if node.right is None:
                         node.right = newNode
                         newNode.parent = node
                         break
                     node = node.right
 
-                elif newNode.value == node.value:
-                    print('Value already put in the tree')
-                    break
+                elif newNode == node:
+                    print('Elemento já foi colocado na árvore')
+                    return
         self.elementos += 1
 
     def search(self, value):
         node = self.root
         if value == node.value:
-            return node.value
+            return node
 
         while True:
             if value > node.value:
@@ -67,16 +99,19 @@ class BinaryTree:
     def remove(self, value):
         node = self.search(value)
         if node is not False:
-            # No child case
-            if node.right is None and node.left is None:
-                if node.parent.right == node:
+            # nó sem filhos
+            if node is self.root:
+                self.root = None
+
+            elif node.right is None and node.left is None:
+                if node.parent.right is node:
                     node.parent.right = None
                     node.parent = None
                 else:
                     node.parent.left = None
                     node.parent = None
 
-            # 2 children case
+            # nó com dois filhos pegando o menor da subárvore da direita
             elif node.right is not None and node.left is not None:
                 curNode = node.right
                 while curNode.left is not None:
@@ -106,7 +141,8 @@ class BinaryTree:
                 elif node.value < node.parent.value:
                     node.parent.left = curNode
 
-            # 1 child case
+            # nó com um filho
+
             elif node.right is None and node.left is not None:
                 if node.value > node.parent.value:
                     node.parent.right = node.left
@@ -125,8 +161,51 @@ class BinaryTree:
                     node.parent.left = node.right
                     node.parent = None
 
+            self.elementos -= 1
+
+            '''
+            nó com dois filhos pegando o maior número da subárvore da esquerda
+
+            elif node.right is not None and node.left is not None:
+                curNode = node.left
+                while curNode.right is not None:
+                    curNode = curNode.right
+
+                curNode.right = node.right
+                node.right.parent = curNode
+
+                if node.left is curNode:
+                    temp2 = curNode.right
+                    curNode.left = node.left.left
+                    curNode.right = temp2
+                    temp2.parent = curNode
+
+                else:
+                    curNode.left = node.left
+                    temp2 = node.left
+                    while temp2.right is not None:
+                        temp2 = temp2.right
+                    temp2.parent.right = None
+
+                curNode.parent = node.parent
+
+                if node.value > node.parent.value:
+                    node.parent.right = curNode
+
+                elif node.value < node.parent.value:
+                    node.parent.left = curNode
+                '''
+
         else:
             return False
+
+    def printPreOrderKeys(self, root=None, lista=[]):
+        if root:
+            lista.append(root.key)
+            self.printPreOrder(root.left, lista)
+            self.printPreOrder(root.right, lista)
+
+        return lista
 
     def printPreOrder(self, root=None, lista=[]):
 
@@ -144,12 +223,15 @@ class BinaryTree:
             print(root.value)
             self.printInOrder(root.right)
 
-    def printPostOrder(self, root=None):
+    def printPostOrder(self, root=None, lista=[]):
 
         if root:
             self.printPostOrder(root.left)
             self.printPostOrder(root.right)
             print(root.value)
+            lista.append(root.value)
+
+        return lista
 
     def vazia(self):
         if self.root is None:
@@ -181,54 +263,76 @@ class BinaryTree:
             def __init__(self, arvore, passo=0):
                 self.arvore = arvore
                 self.passo = passo
+                self.lista = self.arvore.printPreOrder(self.arvore.root)
 
             def __next__(self):
-                lista = self.arvore.printPreOrder(self.arvore.root)
                 if self.passo >= self.arvore.elementos:
                     raise StopIteration
-                value = lista[self.passo]
+                value = self.lista[self.passo]
                 self.passo += 1
 
                 return value
         return Ponteiro(self)
 
-    def reiniar(self):
-        
+    def reiniciar(self):
+        postOrder = self.printPostOrder(self.root)
+        postOrder = postOrder[0:len(postOrder)-1]
+        for i in range(len((postOrder))):
+            self.remove(postOrder[i])
+        self.remove(self.root.value)
 
+    def __getitem__(self, indice):
+        try:
+            if indice >= self.elementos:
+                raise IndexError
+            else:
+                valoresDosNos = self.printPreOrder(self.root)
+                return self.search(valoresDosNos[indice])
 
-if __name__ == '__main__':
-    arvre = BinaryTree()
-    no12 = Node(12)
-    no5 = Node(5)
-    no3 = Node(3)
-    no1 = Node(1)
-    no7 = Node(7)
-    no8 = Node(8)
-    no9 = Node(9)
-    no11 = Node(11)
-    no15 = Node(15)
-    no17 = Node(17)
-    no20 = Node(20)
-    no18 = Node(18)
-    no13 = Node(13)
-    no14 = Node(14)
-    no16 = Node(16)
+        except IndexError:
+            print(
+                'ERRO !\nVocê inseriu um índice maior que a quantidade de itens da lista')
 
+    def __setitem__(self, indice, novoValor):
+        try:
+            if indice >= self.elementos:
+                raise IndexError
+            else:
+                valoresDosNos = self.printPreOrder(self.root)
+                nodo = self.search(valoresDosNos[indice])
+                nodo.value = novoValor
 
-    arvre.insert(no12)
-    arvre.insert(no5)
-    arvre.insert(no3)
-    arvre.insert(no1)
-    arvre.insert(no7)
-    arvre.insert(no9)
-    arvre.insert(no8)
-    arvre.insert(no11)
-    arvre.insert(no15)
-    arvre.insert(no17)
-    arvre.insert(no13)
-    arvre.insert(no14)
-    arvre.insert(no20)
-    arvre.insert(no18)
-    arvre.insert(no16)
+        except IndexError:
+            print(
+                'ERRO !\nVocê inseriu um índice maior que a quantidade de itens da lista')
 
-    print(arvre)
+    def __delitem__(self, indice):
+        try:
+            if indice >= self.elementos:
+                raise IndexError
+            else:
+                valoresDosNos = self.printPreOrder(self.root)
+                self.remove(valoresDosNos[indice])
+
+        except IndexError:
+            print(
+                'ERRO !\nVocê inseriu um índice maior que a quantidade de itens da lista')
+
+    def __contains__(self, key):
+        listaDeChaves = self.printPreOrderKeys(self.root)
+
+        for i in listaDeChaves:
+            if key == i:
+                return True
+
+        return False
+
+    def chaves(self):
+        todasAsChaves = self.printPreOrderKeys(self.root)
+        for i in todasAsChaves:
+            print(i)
+
+    def valores(self):
+        todosOsValores = self.printPreOrder(self.root)
+        for i in todosOsValores:
+            print(i)
